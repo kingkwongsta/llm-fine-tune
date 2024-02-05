@@ -1,5 +1,6 @@
 import Replicate from "replicate";
 import * as dotenv from "dotenv";
+import fs from "fs/promises";
 dotenv.config();
 
 // Trainable large language models on replicate.com
@@ -33,13 +34,22 @@ const replicate = new Replicate({
 });
 
 async function main() {
-  const training = await replicate.trainings.create("replicate", llm, version, {
-    destination,
-    input: {
-      train_data: training_data_url,
-    },
-  });
-  console.log(`URL: https://replicate.com/p/${training.id}`);
+  try {
+    const training = await replicate.trainings.create(
+      "replicate",
+      llm,
+      version,
+      {
+        destination,
+        input: {
+          train_data: training_data_url,
+        },
+      }
+    );
+    console.log(`URL: https://replicate.com/p/${training.id}`);
+  } catch (error) {
+    console.error("Error:", error.message || error);
+  }
 }
 
 main();

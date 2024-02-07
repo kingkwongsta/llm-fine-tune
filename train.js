@@ -1,6 +1,5 @@
 import Replicate from "replicate";
 import * as dotenv from "dotenv";
-import fs from "fs/promises";
 dotenv.config();
 
 // Trainable large language models on replicate.com
@@ -19,37 +18,27 @@ const LLMs = {
   ],
 };
 
-// Choose your LLM (llama, gpt, flan)
 const [llm, version] = LLMs.llama;
 
-// Your Replicate username/model to save the fine tuning to
 const destination = "kingkwongsta/first-training";
 
-// URL to your training data
 const training_data_url =
   "https://raw.githubusercontent.com/kingkwongsta/file-storage/main/output_cocktail.jsonl";
+
+const local_training_data = "./output_cocktail.jsonl"; // replace with the local file name
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
 
 async function main() {
-  try {
-    const training = await replicate.trainings.create(
-      "replicate",
-      llm,
-      version,
-      {
-        destination,
-        input: {
-          train_data: training_data_url,
-        },
-      }
-    );
-    console.log(`URL: https://replicate.com/p/${training.id}`);
-  } catch (error) {
-    console.error("Error:", error.message || error);
-  }
+  const training = await replicate.trainings.create("replicate", llm, version, {
+    destination,
+    input: {
+      train_data: local_training_data,
+    },
+  });
+  console.log(`URL: https://replicate.com/p/${training.id}`);
 }
 
 main();

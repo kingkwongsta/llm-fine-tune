@@ -23,7 +23,7 @@ for entry in data_list:
     output_list.append(output)
 
 # Set the output file path
-output_file = "CONVERTED_DATA.jsonl"
+output_file = "CONVERTED_Dedup.jsonl"
 
 # Open the output file with UTF-8 encoding
 with open(output_file, "w", encoding="utf-8") as f:  # Added encoding="utf-8"

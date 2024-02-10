@@ -1,33 +1,29 @@
 import json
 
-def remove_duplicates(filename):
+def dedup_cocktails(input_file, output_file):
   """
-  Removes duplicate entries from a JSON file based on the "content" field.
+  Deduplicates rows in a .jsonl file based on cocktail name and content.
 
   Args:
-    filename: The path to the JSON file.
-
-  Returns:
-    A list of unique entries.
+    input_file: The path to the input .jsonl file.
+    output_file: The path to the output .jsonl file.
   """
-  with open(filename, "r", encoding="utf-8") as f:  # Use UTF-8 encoding for reading
-    data_list = json.load(f)
-
-  seen_content = set()
+  seen_cocktails = set()
   unique_entries = []
-  for entry in data_list:
-    content = entry["messages"][2]["content"]
-    if content not in seen_content:
-      seen_content.add(content)
-      unique_entries.append(entry)
+  with open(input_file, "r", encoding="utf-8") as f, open(output_file, "w", encoding="utf-8") as out:
+    for line in f:
+      entry = json.loads(line)
+      cocktail_name = entry["messages"][1]["content"]
+      content = entry["messages"][2]["content"]
+      key = (cocktail_name, content)
+      if key not in seen_cocktails:
+        seen_cocktails.add(key)
+        unique_entries.append(entry)
+        json.dump(entry, out, ensure_ascii=False, indent=4)
 
-  return unique_entries
+  print(f"Deduplicated {len(unique_entries)} entries. Saved to {output_file}")
 
 # Example usage
-unique_entries = remove_duplicates("data/CONVERTED_DATA.jsonl")
-
-# Save the deduplicated data to a new file
-with open("deduplicated_data.json", "w", encoding="utf-8") as f:  # Use UTF-8 encoding for writing
-  json.dump(unique_entries, f, indent=4)
-
-print("Deduplication complete!")
+input_file = "data/CONVERTED_DATA.jsonl"
+output_file = "deduplicated_cocktails.jsonl"
+dedup_cocktails(input_file, output_file)
